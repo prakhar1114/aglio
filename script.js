@@ -62,18 +62,56 @@ function main() {
     if (playBtn) playBtn.removeAttribute("disabled");
   }
 
+  const isShort = YOUTUBE_URL.includes("shorts");
+  const thumbUrl = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
+
   function open() {
     if (!hasVideo || !dialog || !frame) return;
     frame.innerHTML = "";
-    const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(
-      videoId,
-    )}?autoplay=1&rel=0&modestbranding=1`;
-    iframe.allow =
-      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    iframe.allowFullscreen = true;
-    iframe.title = "Aglio demo video";
-    frame.appendChild(iframe);
+    frame.classList.toggle("video-frame--short", isShort);
+    dialog.classList.toggle("video-modal--short", isShort);
+
+    const thumbnail = document.createElement("div");
+    thumbnail.className = "video-thumbnail";
+    thumbnail.setAttribute("role", "button");
+    thumbnail.tabIndex = 0;
+    thumbnail.setAttribute("aria-label", "Play video");
+
+    const img = document.createElement("img");
+    img.src = thumbUrl;
+    img.alt = "";
+    img.loading = "eager";
+    img.dataset.videoThumb = "1";
+
+    const playBtnOverlay = document.createElement("span");
+    playBtnOverlay.className = "video-thumbnail-play";
+    playBtnOverlay.setAttribute("aria-hidden", "true");
+
+    thumbnail.appendChild(img);
+    thumbnail.appendChild(playBtnOverlay);
+
+    function playVideo() {
+      thumbnail.remove();
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(
+        videoId,
+      )}?autoplay=1&rel=0&modestbranding=1`;
+      iframe.allow =
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      iframe.title = "Aglio demo video";
+      frame.appendChild(iframe);
+    }
+
+    thumbnail.addEventListener("click", playVideo);
+    thumbnail.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        playVideo();
+      }
+    });
+
+    frame.appendChild(thumbnail);
     dialog.showModal();
   }
 
@@ -81,6 +119,7 @@ function main() {
     if (!dialog || !frame) return;
     dialog.close();
     frame.innerHTML = "";
+    dialog.classList.remove("video-modal--short");
   }
 
   playBtn?.addEventListener("click", open);
