@@ -6,7 +6,7 @@
  * - https://youtu.be/VIDEO_ID
  * - https://www.youtube.com/shorts/VIDEO_ID
  */
-const YOUTUBE_URL = "";
+const YOUTUBE_URL = "https://youtube.com/shorts/7_ReEvZLyNA?si=kyqXateBVmDwfMQ6";
 
 function parseYouTubeId(url) {
   if (!url) return null;
